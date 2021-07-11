@@ -1,58 +1,51 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import "./App.css";
 
-import { getData } from "./getData";
+import TableUserLocation from "./components/Table";
+
+import { sortBy } from "./utils/sortData";
+import { getData } from "./utils/getData";
 
 function App() {
-  const [data, setData] = useState();
+  const [data, setData] = useState([]);
+  const [userFiltered, setUserFiltered] = useState([]);
+  const [isSorted, setIsSorted] = useState(true);
+  const [searchValue, setSearchValue] = useState("");
+
+  const sort = (name) => {
+    setUserFiltered(sortBy(data, name, isSorted));
+    setIsSorted(!isSorted);
+  };
+
+  const handleSearch = (e) => {
+    setSearchValue(e.target.value);
+  };
 
   useEffect(() => {
-    const getUserData = async () => {
-      const users = await getData();
-      setData(users);
-    };
-
-    getUserData();
+    getData().then(setData);
   }, []);
 
-  const sortBy = (name) => {
-    return data.sort((x, y) =>
-      x.location[name].localeCompare(y.location[name])
+  useEffect(() => {
+    setUserFiltered(
+      data.filter(
+        (el) =>
+          el.location.city.toLowerCase().includes(searchValue.toLowerCase()) ||
+          el.location.state.toLowerCase().includes(searchValue.toLowerCase()) ||
+          el.location.country.toLowerCase().includes(searchValue.toLowerCase())
+      )
     );
-  };
+  }, [searchValue, data]);
 
   return (
     <div className="App">
-      <input type="text" />
-      <table>
-        <tr>
-          <th onClick={() => setData(sortBy("city"))}>City</th>
-          <th onClick={() => setData(sortBy("city"))}>State</th>
-          <th onClick={() => setData(sortBy("city"))}>Country</th>
-          <th onClick={() => setData(sortBy("city"))}>Postcode</th>
-          <th onClick={() => setData(sortBy("city"))}>Number</th>
-          <th onClick={() => setData(sortBy("city"))}>Name</th>
-          <th onClick={() => setData(sortBy("city"))}>Latitude</th>
-          <th onClick={() => setData(sortBy("city"))}>Longitude</th>
-        </tr>
-        <tbody>
-          {data?.map((el, i) => {
-            return (
-              <tr key={i}>
-                <td>{el.location.city}</td>
-                <td>{el.location.state}</td>
-                <td>{el.location.country}</td>
-                <td>{el.location.postcode}</td>
-                <td>{el.location.street.number}</td>
-                <td>{el.location.street.name}</td>
-                <td>{el.location.coordinates.latitude}</td>
-                <td>{el.location.coordinates.longitude}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      <input
+        type="text"
+        placeholder="Search for..."
+        value={searchValue}
+        onChange={handleSearch}
+      />
+      <TableUserLocation data={userFiltered} filter={sort} />
     </div>
   );
 }

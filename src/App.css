@@ -5,18 +5,31 @@
 body {
   width: 80%;
   padding: 1rem;
-  margin: auto;
   align-items: center;
+}
+
+input,
+input:focus {
+  font-size: 16px;
+  margin: 1rem;
+  padding: 8px;
+  border: solid #888 1px;
 }
 
 table {
   width: 100%;
+  font-family: Helvetica, sans-serif;
+  font-size: 17px;
 }
 
 tr {
   width: 100%;
+  margin: 0px;
+  padding: 3px;
 }
 
-td{
-  width: 25%;
+th {
+  background-color: #ccc;
+  padding: 3px;
+  border-radius: 3px;
 }
